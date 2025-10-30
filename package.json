@@ -1,0 +1,37 @@
+{
+  "name": "news_site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hardikdevaliya2006/News_Site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hardikdevaliya2006/News_Site/issues"
+  },
+  "homepage": "https://github.com/hardikdevaliya2006/News_Site#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.2",
+    "mongoose-paginate-v2": "^1.9.1",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
+    "slugify": "^1.6.6"
+  }
+}
