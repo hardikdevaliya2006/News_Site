@@ -4,28 +4,22 @@ import userModel from "../models/User.model.js";
 
 // Article CRUD Controllers Functions
 const allArticle = async (req, res) => {
-  res.render("admin/articles")
+  res.render("admin/articles", { role: req.role });
 };
 
 const addArticlePage = async (req, res) => {
-  res.render("admin/articles/create")
+  res.render("admin/articles/create", { role: req.role });
 };
 
-const addArticle = async (req, res) => {
-
-};
+const addArticle = async (req, res) => {};
 
 const updateArticlePage = async (req, res) => {
-  res.render("admin/articles/update")
+  res.render("admin/articles/update", { role: req.role });
 };
 
-const updateArticle = async (req, res) => {
+const updateArticle = async (req, res) => {};
 
-};
-
-const deleteArticle = async (req, res) => {
-  
-};
+const deleteArticle = async (req, res) => {};
 
 export default {
   allArticle,
