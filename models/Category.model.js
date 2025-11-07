@@ -4,7 +4,7 @@ import slugify from "slugify";
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
   },
   description: {
@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
   },
   timestamps: {
@@ -21,7 +21,7 @@ const categorySchema = new mongoose.Schema({
   },
 });
 
-categorySchema.pre("save", function (next) {
+categorySchema.pre("validate", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
