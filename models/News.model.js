@@ -22,7 +22,11 @@ const newsSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: Date.now(),
+    required: true 
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
@@ -30,4 +34,4 @@ newsSchema.plugin(mongoosePaginate);
 
 const News = mongoose.model("News", newsSchema);
 
-export default News
+export default News;

@@ -5,6 +5,7 @@ import commentController from "../controllers/comment.controller.js";
 import userController from "../controllers/user.controller.js";
 import isLoginUser from "../middleware/isLoginUser.js";
 import isAdmin from "../middleware/isAdmin.js";
+import upload from "../middleware/multer.js";
 
 const router = express.Router();
 
@@ -34,12 +35,12 @@ router.delete("/delete-category/:id", isLoginUser, isAdmin, categoryController.d
 // Article CRUD Operations
 router.get("/article", isLoginUser, articleController.allArticle);
 router.get("/add-article", isLoginUser, articleController.addArticlePage);
-router.post("/add-article", isLoginUser, articleController.addArticle);
+router.post("/add-article", isLoginUser, upload.single('image'), articleController.addArticle);
 router.get("/update-article/:id", isLoginUser, articleController.updateArticlePage);
-router.post("/update-article/:id", isLoginUser, articleController.updateArticle);
+router.post("/update-article/:id", isLoginUser, upload.single('image'), articleController.updateArticle);
 router.delete("/delete-article/:id", isLoginUser, articleController.deleteArticle);
 
-// Comments Routes
+// Comments Routes 
 router.get("/comments", isLoginUser, commentController.allComments);
 
 export default router;
