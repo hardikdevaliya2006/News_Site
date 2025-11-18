@@ -1,6 +1,9 @@
 import categoriesModel from "../models/Category.model.js";
 import newsModel from "../models/News.model.js";
 import userModel from "../models/User.model.js";
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
 
 // Article CRUD Controllers Functions
 const allArticle = async (req, res) => {
@@ -49,17 +52,20 @@ const addArticle = async (req, res) => {
 
 const updateArticlePage = async (req, res) => {
   const id = req.params.id;
+
   try {
     const article = await newsModel
       .findById(id)
       .populate("category", "name")
-      .populate("author", "fullname");
+      .populate("author", "fullname _id");
+
     if (!article) {
       return res.status(404).send("Article Not Found");
     }
+
     if (req.role === "author") {
-      if (req.id !== article.author.id) {
-        return res.status(404).send("Unothrized");
+      if (req.id.toString() !== article.author._id.toString()) {
+        return res.status(401).send("Unauthorized");
       }
     }
 
@@ -77,15 +83,18 @@ const updateArticlePage = async (req, res) => {
 
 const updateArticle = async (req, res) => {
   const id = req.params.id;
+
   try {
     const { title, content, category } = req.body;
     const article = await newsModel.findById(id);
+
     if (!article) {
       return res.status(404).send("Article Not Found");
     }
+
     if (req.role === "author") {
-      if (req.id !== article.author.id) {
-        return res.status(404).send("Unothrized");
+      if (req.id.toString() !== article.author.toString()) {
+        return res.status(401).send("Unauthorized");
       }
     }
 
@@ -94,6 +103,16 @@ const updateArticle = async (req, res) => {
     article.category = category;
 
     if (req.file) {
+      const oldImagePath = path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "../public/uploads",
+        article.image
+      );
+
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+
       article.image = req.file.filename;
     }
 
@@ -112,10 +131,25 @@ const deleteArticle = async (req, res) => {
     if (!article) {
       return res.status(404).send("Article Not Found");
     }
+
     if (req.role === "author") {
-      if (req.id !== article.author.id) {
+      if (req.id !== article.author.toString()) {
         return res.status(404).send("Unothrized");
       }
+    }
+
+    try {
+      const imagePath = path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "../public/uploads",
+        article.image
+      );
+
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    } catch (error) {
+      console.error("Error to delete the image : ", error);
     }
 
     await article.deleteOne();

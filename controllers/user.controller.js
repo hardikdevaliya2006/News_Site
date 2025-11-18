@@ -1,4 +1,6 @@
 import userModel from "../models/User.model.js";
+import newsModel from "../models/News.model.js";
+import categoryModel from "../models/Category.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -41,7 +43,22 @@ const logout = async (req, res) => {
 };
 
 const dashBoard = async (req, res) => {
-  res.render("admin/dashboard", { role: req.role, fullname: req.fullname });
+  let articleCount;
+  if (req.role === "author") {
+    articleCount = await newsModel.countDocuments({ author: req.id });
+  } else {
+    articleCount = await newsModel.countDocuments();
+  }
+  const userCount = await newsModel.countDocuments();
+  const categoryCount = await categoryModel.countDocuments();
+
+  res.render("admin/dashboard", {
+    role: req.role,
+    fullname: req.fullname,
+    articleCount,
+    userCount,
+    categoryCount,
+  });
 };
 
 const settings = async (req, res) => {

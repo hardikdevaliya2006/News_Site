@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     const newFileName =     Date.now() + path.extname(file.originalname);
     cb(null, newFileName);
   },
-});
+})
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
