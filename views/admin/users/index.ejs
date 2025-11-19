@@ -51,6 +51,13 @@
       const response = await fetch(`/admin/delete-user/${userId}`, {
         method: 'DELETE'
       })
+
+      
+      if(response.status == 400){
+        const data = await response.json()
+        alert(data.message)
+      }
+
       if(response.ok){
         window.location.reload()
       }

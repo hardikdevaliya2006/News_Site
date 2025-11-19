@@ -10,9 +10,7 @@
         <a class="add-new" href="/admin/add-category">add category</a>
       </div>
       <div class="col-md-12">
-        <div id="categoriesTable">
-
-        </div>
+        <div id="categoriesTable"></div>
       </div>
     </div>
   </div>
@@ -42,7 +40,7 @@
             <a href="/admin/update-category/${cell.getData()._id}" class="btn btn-sm btn-success">Edit</a>
             <button class="btn btn-sm btn-danger delete-category" onclick="deleteCategory('${cell.getData()._id}')">Delete</button>
           `;
-        } , 
+        } ,
       },
     ],
   })
@@ -52,6 +50,10 @@
       const response = await fetch(`/admin/delete-category/${id}`, {
         method: 'DELETE'
       })
+      if(response.status == 400){
+        const data = await response.json()
+        alert(data.message)
+      }
       if(response.ok){
         window.location.reload()
       }
@@ -62,5 +64,8 @@
 </script>
 
 <%- contentFor('tabulatorCSS') %>
-<link href="https://unpkg.com/tabulator-tables@6.0.0/dist/css/tabulator.min.css" rel="stylesheet" />
+<link
+  href="https://unpkg.com/tabulator-tables@6.0.0/dist/css/tabulator.min.css"
+  rel="stylesheet"
+/>
 <link href="/css/tabulator_bootstrap5.min.css" rel="stylesheet" />

@@ -4,9 +4,11 @@ import userModel from "../models/User.model.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
+import createError from "../utils/error-message.js";
+import { validationResult } from "express-validator";
 
 // Article CRUD Controllers Functions
-const allArticle = async (req, res) => {
+const allArticle = async (req, res, next) => {
   try {
     let articles;
     if (req.role === "admin") {
@@ -22,17 +24,22 @@ const allArticle = async (req, res) => {
     }
     res.render("admin/articles", { role: req.role, articles });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
 const addArticlePage = async (req, res) => {
   const category = await categoriesModel.find();
-  res.render("admin/articles/create", { category, role: req.role });
+  res.render("admin/articles/create", { category, role: req.role, error: 0 });
 };
 
-const addArticle = async (req, res) => {
+const addArticle = async (req, res, next) => {
+  const error = validationResult(req)
+  if (!error.isEmpty()) {
+    const category = await categoriesModel.find();
+    return res.render("admin/articles/create", { category, role: req.role, error: error.array() });
+  }
+
   try {
     const { title, content, category } = req.body;
     const article = new newsModel({
@@ -45,12 +52,11 @@ const addArticle = async (req, res) => {
     await article.save();
     res.redirect("/admin/article");
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-const updateArticlePage = async (req, res) => {
+const updateArticlePage = async (req, res, next) => {
   const id = req.params.id;
 
   try {
@@ -60,12 +66,12 @@ const updateArticlePage = async (req, res) => {
       .populate("author", "fullname _id");
 
     if (!article) {
-      return res.status(404).send("Article Not Found");
+      return next(createError("Article Not Found", 404));
     }
 
     if (req.role === "author") {
       if (req.id.toString() !== article.author._id.toString()) {
-        return res.status(401).send("Unauthorized");
+        return next(createError("Unauthorized", 401));
       }
     }
 
@@ -74,27 +80,36 @@ const updateArticlePage = async (req, res) => {
       article,
       categories,
       role: req.role,
+      error: 0
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-const updateArticle = async (req, res) => {
-  const id = req.params.id;
+const updateArticle = async (req, res, next) => {
+  const error = validationResult(req)
+  if (!error.isEmpty()) {
+    const categories = await categoriesModel.find();
+    return res.render("admin/articles/update", {
+      article: req.body,
+      categories,
+      role: req.role, error: error.array()
+    });
+  }
 
+  const id = req.params.id;
   try {
     const { title, content, category } = req.body;
     const article = await newsModel.findById(id);
 
     if (!article) {
-      return res.status(404).send("Article Not Found");
+      return next(createError("Article Not Found", 404));
     }
 
     if (req.role === "author") {
       if (req.id.toString() !== article.author.toString()) {
-        return res.status(401).send("Unauthorized");
+        return next(createError("Unauthorized", 401));
       }
     }
 
@@ -119,22 +134,21 @@ const updateArticle = async (req, res) => {
     await article.save();
     res.redirect("/admin/article");
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
-const deleteArticle = async (req, res) => {
+const deleteArticle = async (req, res, next) => {
   const id = req.params.id;
   try {
     const article = await newsModel.findById(id);
     if (!article) {
-      return res.status(404).send("Article Not Found");
+      return next(createError("Article Not Found", 404));
     }
 
     if (req.role === "author") {
       if (req.id !== article.author.toString()) {
-        return res.status(404).send("Unothrized");
+        return next(createError("Unauthorized", 401));
       }
     }
 
@@ -155,8 +169,7 @@ const deleteArticle = async (req, res) => {
     await article.deleteOne();
     res.send({ success: true });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 

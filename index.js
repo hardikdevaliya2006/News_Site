@@ -23,7 +23,7 @@ app.set("layout", "layout");
 app.set("view engine", "ejs");
 
 // Fronted Routes
-app.get("/", frontedRoutes);
+app.use("/", frontedRoutes);
 
 // Admin Routes
 app.use("/admin", (req, res, next) => {
