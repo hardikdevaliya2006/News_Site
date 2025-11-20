@@ -19,7 +19,9 @@ const categorySchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-});
+},
+  { timestamps: true }
+);
 
 categorySchema.pre("validate", function (next) {
   this.slug = slugify(this.name, { lower: true });

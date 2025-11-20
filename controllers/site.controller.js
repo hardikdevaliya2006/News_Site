@@ -1,18 +1,23 @@
 import categoriesModel from "../models/Category.model.js";
 import newsModel from "../models/News.model.js";
 import userModel from "../models/User.model.js";
-import settingsModel from "../models/Settings.model.js"
+import paginateData from "../utils/paginateData.js";
 
 // Site Controllers Functions
 const index = async (req, res) => {
-  const news = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
-  
-  const ctategoriesInNews = await newsModel.distinct('category')
-  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
-  const settings = await settingsModel.findOne()
-  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
+  const paginateNews = await paginateData(newsModel,
+    {},
+    req.query,
+    {
+      populate: [
+        { path: 'category', select: 'name slug' },
+        { path: 'author', select: 'fullname' }
+      ],
+      sort: '-createdAt'
+    }
+  )
 
-  res.render("index", { news, categories, latestNews, settings });
+  res.render("index", { paginateNews, qurey: req.query });
 };
 
 const articleByCategories = async (req, res) => {
@@ -21,44 +26,48 @@ const articleByCategories = async (req, res) => {
     return res.status(404).send('Category not found.');
   }
 
-  const news = await newsModel.find({ category: category._id }).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
-  const ctategoriesInNews = await newsModel.distinct('category')
-  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
-  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
+  const paginateNews = await paginateData(newsModel,
+    { category: category._id },
+    req.query,
+    {
+      populate: [
+        { path: 'category', select: 'name slug' },
+        { path: 'author', select: 'fullname' }
+      ],
+      sort: '-createdAt'
+    }
+  )
 
-  res.render("category", { news, categories, category, latestNews });
+  res.render("category", { paginateNews, category, qurey: req.query });
 };
 
 const singleArticle = async (req, res) => {
   const singleNews = await newsModel.findById(req.params.id).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
-  const ctategoriesInNews = await newsModel.distinct('category')
-  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
-  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
-
-  res.render("single", { singleNews, categories, latestNews });
+  res.render("single", { singleNews });
 };
 
 const search = async (req, res) => {
   const searchQuery = req.query.search
 
-  const news = await newsModel.find(
+  const paginateNews = await paginateData(newsModel,
     {
       $or:
         [
           { title: { $regex: searchQuery, $options: 'i' } },
           { content: { $regex: searchQuery, $options: 'i' } }
         ]
+    },
+    req.query,
+    {
+      populate: [
+        { path: 'category', select: 'name slug' },
+        { path: 'author', select: 'fullname' }
+      ],
+      sort: '-createdAt'
     }
   )
-    .populate('category', { 'name': 1, 'slug': 1 })
-    .populate('author', 'fullname')
-    .sort({ createdAt: -1 })
 
-  const ctategoriesInNews = await newsModel.distinct('category')
-  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
-  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
-
-  res.render("search", { news, categories, searchQuery, latestNews });
+  res.render("search", { paginateNews, searchQuery, qurey: req.query });
 };
 
 const author = async (req, res) => {
@@ -67,12 +76,19 @@ const author = async (req, res) => {
     return res.status(404).send('Author Not found');
   }
 
-  const news = await newsModel.find({ author: req.params.id }).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
-  const ctategoriesInNews = await newsModel.distinct('category')
-  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
-  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
+  const paginateNews = await paginateData(newsModel,
+    { author: req.params.id },
+    req.query,
+    {
+      populate: [
+        { path: 'category', select: 'name slug' },
+        { path: 'author', select: 'fullname' }
+      ],
+      sort: '-createdAt'
+    }
+  )
 
-  res.render("author", { news, categories, author, latestNews });
+  res.render("author", { paginateNews, author, qurey: req.query });
 };
 
 const addComment = async (req, res) => { };

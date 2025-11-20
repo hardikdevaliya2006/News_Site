@@ -24,7 +24,9 @@ const commentSchema = new mongoose.Schema({
     default: "pending",
     require: true,
   },
-});
+},
+  { timestamps: true }
+);
 
 const Comments = mongoose.model("Comments", commentSchema);
 

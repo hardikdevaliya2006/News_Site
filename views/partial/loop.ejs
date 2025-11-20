@@ -1,4 +1,4 @@
-<% news.forEach((newsItem) => {%>
+<% news = paginateNews.data %> <% news.forEach((newsItem) => {%>
 <div class="post-content">
   <div class="row">
     <div class="col-md-4">
@@ -39,20 +39,47 @@
     </div>
   </div>
 </div>
-<% }) %>
+<% }) %> 
+
+<% function buildQurey(qurey, page) { 
+  const params = new URLSearchParams(qurey) 
+  params.set('page', page) 
+  return '?' + params.toString() 
+} 
+%>
 
 <nav>
   <ul class="pagination">
+    <% if(paginateNews.hasPrevPage){ %>
+    <li class="page-item">
+      <a
+        class="page-link"
+        href="<%= buildQurey(qurey, paginateNews.prevPage) %>"
+        >Previous</a
+      >
+    </li>
+    <% } else { %>
     <li class="page-item disabled">
       <a class="page-link">Previous</a>
     </li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item active">
-      <a class="page-link" href="#" aria-current="page">2</a>
+    <% } %> <% for(let i = 1; i<=paginateNews.totalPages; i++) { %>
+    <li
+      class="page-item <%= (i === paginateNews.currentPage) ? 'active' : '' %>"
+    >
+      <a class="page-link" href="<%= buildQurey(qurey, i) %>"><%= i %></a>
     </li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <% } %> <% if(paginateNews.hasNextPage){ %>
     <li class="page-item">
-      <a class="page-link" href="#">Next</a>
+      <a
+        class="page-link"
+        href="<%= buildQurey(qurey, paginateNews.nextPage) %>"
+        >Next</a
+      >
     </li>
+    <% } else { %>
+    <li class="page-item disabled">
+      <a class="page-link">Next</a>
+    </li>
+    <% } %>
   </ul>
 </nav>
