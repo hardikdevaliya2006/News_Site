@@ -113,6 +113,8 @@ router.delete(
 
 // Comments Routes
 router.get("/comments", isLoginUser, commentController.allComments);
+router.put("/update-comments-status", isLoginUser, commentController.updateCommentStatus);
+router.delete("/comments", isLoginUser, commentController.deleteComment);
 
 // 404 Middleware
 router.use((req, res, next) => {

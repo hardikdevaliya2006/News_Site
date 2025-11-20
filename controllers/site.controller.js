@@ -2,6 +2,7 @@ import categoriesModel from "../models/Category.model.js";
 import newsModel from "../models/News.model.js";
 import userModel from "../models/User.model.js";
 import paginateData from "../utils/paginateData.js";
+import commentModel from "../models/Comment.model.js";
 
 // Site Controllers Functions
 const index = async (req, res) => {
@@ -43,7 +44,10 @@ const articleByCategories = async (req, res) => {
 
 const singleArticle = async (req, res) => {
   const singleNews = await newsModel.findById(req.params.id).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
-  res.render("single", { singleNews });
+  const comment = await commentModel.find({ article: req.params.id, status: "approved" }).sort('-createdAt')
+
+  // res.send (comment)
+  res.render("single", { singleNews, comment });
 };
 
 const search = async (req, res) => {
@@ -91,7 +95,16 @@ const author = async (req, res) => {
   res.render("author", { paginateNews, author, qurey: req.query });
 };
 
-const addComment = async (req, res) => { };
+const addComment = async (req, res) => {
+  try {
+    const { name, email, content } = req.body
+    const comment = await new commentModel({ name, email, content, article: req.params.id })
+    await comment.save()
+    res.redirect(`/single/${req.params.id}`);
+  } catch (error) {
+    res.send(500).send('Error adding comment');
+  }
+};
 
 export default {
   index,

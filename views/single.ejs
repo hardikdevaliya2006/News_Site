@@ -37,7 +37,7 @@
   <!-- Comment Form -->
   <div class="card mb-4">
     <div class="card-body">
-      <form action="/article/1/comment" method="POST">
+      <form action="/single/<%= singleNews._id %>/comment" method="POST">
         <div class="mb-3">
           <label class="form-label">Name</label>
           <input type="text" class="form-control" name="name" required />
@@ -51,7 +51,7 @@
           <textarea
             class="form-control"
             name="content"
-            rows="3"
+            rows="3"    
             required
           ></textarea>
         </div>
@@ -62,15 +62,16 @@
 
   <!-- Display Comments -->
   <div class="comments-list">
+    <% comment.forEach((commentItem) => {  %> 
     <div class="card mb-3">
       <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted">User Name</h6>
+        <h6 class="card-subtitle mb-2 text-muted"><%= commentItem.name %></h6>
         <p class="card-text">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam est
-          laboriosam rerum saepe odit exercitationem earum sequi in ipsum culpa!
+         <%= commentItem.content %>
         </p>
-        <small class="text-muted">Posted on 10-10-2020</small>
+        <small class="text-muted">Posted <%= commentItem.createdAt.toDateString() %></small>
       </div>
     </div>
+    <% }) %>
   </div>
 </div>
