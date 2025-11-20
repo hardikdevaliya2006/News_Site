@@ -1,15 +1,18 @@
 import categoriesModel from "../models/Category.model.js";
 import newsModel from "../models/News.model.js";
 import userModel from "../models/User.model.js";
-
+import settingsModel from "../models/Settings.model.js"
 
 // Site Controllers Functions
 const index = async (req, res) => {
   const news = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
+  
   const ctategoriesInNews = await newsModel.distinct('category')
-  const ctategories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const settings = await settingsModel.findOne()
+  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
 
-  res.render("index", { news, ctategories });
+  res.render("index", { news, categories, latestNews, settings });
 };
 
 const articleByCategories = async (req, res) => {
@@ -20,17 +23,19 @@ const articleByCategories = async (req, res) => {
 
   const news = await newsModel.find({ category: category._id }).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
   const ctategoriesInNews = await newsModel.distinct('category')
-  const ctategories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
 
-  res.render("category", { news, ctategories, category });
+  res.render("category", { news, categories, category, latestNews });
 };
 
 const singleArticle = async (req, res) => {
   const singleNews = await newsModel.findById(req.params.id).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
   const ctategoriesInNews = await newsModel.distinct('category')
-  const ctategories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
 
-  res.render("single", { singleNews, ctategories });
+  res.render("single", { singleNews, categories, latestNews });
 };
 
 const search = async (req, res) => {
@@ -50,9 +55,10 @@ const search = async (req, res) => {
     .sort({ createdAt: -1 })
 
   const ctategoriesInNews = await newsModel.distinct('category')
-  const ctategories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
 
-  res.render("search", { news, ctategories, searchQuery });
+  res.render("search", { news, categories, searchQuery, latestNews });
 };
 
 const author = async (req, res) => {
@@ -63,9 +69,10 @@ const author = async (req, res) => {
 
   const news = await newsModel.find({ author: req.params.id }).populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort({ createdAt: -1 })
   const ctategoriesInNews = await newsModel.distinct('category')
-  const ctategories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const categories = await categoriesModel.find({ '_id': { $in: ctategoriesInNews } })
+  const latestNews = await newsModel.find().populate('category', { 'name': 1, 'slug': 1 }).populate('author', 'fullname').sort(({ createdAt: -1 })).limit(3)
 
-  res.render("author", { news, ctategories, author });
+  res.render("author", { news, categories, author, latestNews });
 };
 
 const addComment = async (req, res) => { };

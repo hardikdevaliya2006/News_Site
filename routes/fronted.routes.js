@@ -1,6 +1,9 @@
 import express from "express";
 import siteController from "../controllers/site.controller.js";
+import loadCommanData from "../middleware/loadCommanData.js";
 const router = express.Router();
+
+router.use(loadCommanData)
 
 router.get("/", siteController.index);
 router.get("/category/:name", siteController.articleByCategories);
